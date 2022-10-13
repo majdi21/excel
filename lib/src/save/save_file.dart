@@ -604,9 +604,38 @@ class Save {
       uniqueCount += 1;
       count += ss.count;
 
-      shareString.children.add(XmlElement(XmlName('si'), [], [
-        XmlElement(XmlName('t'), [], [XmlText(string)]),
-      ]));
+      // shareString.children.add(XmlElement(XmlName('si'), [], [
+      //   XmlElement(XmlName('t'), [], [XmlText(string)])
+      // ]));
+      List<String> strings = string.split('|');
+      List<XmlElement> values = [];
+      for (int i = 0; i < strings.length; i++) {
+        String newLine = (i == strings.length - 1) ? '' : '\n';
+        String e = strings[i];
+        List<String> lineAndColor = e.split(',');
+        if (lineAndColor.length == 1) {
+          values.add(XmlElement(XmlName('t'), [], [XmlText(lineAndColor[0])]));
+        } else if (lineAndColor.length == 2) {
+          values.add(XmlElement(XmlName('r'), [], [
+            XmlElement(XmlName('rPr'), [], [
+              XmlElement(
+                  XmlName('sz'), [XmlAttribute(XmlName('val'), '10')], []),
+              XmlElement(XmlName('color'),
+                  [XmlAttribute(XmlName('rgb'), lineAndColor[1])], []),
+              XmlElement(XmlName('rFont'),
+                  [XmlAttribute(XmlName('val'), 'Arial')], []),
+              XmlElement(
+                  XmlName('family'), [XmlAttribute(XmlName('val'), '2')], []),
+            ]),
+            XmlElement(
+                XmlName('t'),
+                [XmlAttribute(XmlName('xml:space'), 'preserve')],
+                [XmlText('${lineAndColor[0]}$newLine')]),
+          ]));
+        }
+      }
+
+      shareString.children.add(XmlElement(XmlName('si'), [], values));
     });
 
     [
